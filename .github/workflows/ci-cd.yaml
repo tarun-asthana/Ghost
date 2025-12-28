@@ -19,7 +19,7 @@ env:
 jobs:
   prepare:
     name: Prepare metadata
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
       short_sha: ${{ steps.meta.outputs.short_sha }}
@@ -34,7 +34,7 @@ jobs:
   sonarqube:
     name: SonarQube Analysis
     needs: prepare
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,7 +54,7 @@ jobs:
   build_push:
     name: Build & Push Image
     needs: [prepare, sonarqube]
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     env:
       IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
     steps:
@@ -91,7 +91,7 @@ jobs:
   deploy_staging:
     name: Deploy to Staging
     needs: build_push
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: SSH into staging & deploy
@@ -117,7 +117,7 @@ jobs:
   smoke_test_staging:
     name: Smoke Test Staging
     needs: deploy_staging
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     steps:
       - name: Check staging URL
         run: |
@@ -132,7 +132,7 @@ jobs:
   deploy_production:
     name: Deploy to Production
     needs: smoke_test_staging
-    runs-on: [self-hosted, devops-runner]
+    runs-on: self-hosted
     environment:
       name: production
     steps:
